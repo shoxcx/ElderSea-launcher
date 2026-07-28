@@ -1,0 +1,56 @@
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      isLoggedIn: false,
+      login: (pseudo, email = 'player@eldersea.io', createdAt = null) => set({ 
+        user: { 
+          pseudo, 
+          email, 
+          createdAt: createdAt || new Date().toLocaleDateString(),
+          isPremium: true 
+        }, 
+        isLoggedIn: true 
+      }),
+      logout: () => set({ user: null, isLoggedIn: false }),
+      updateUser: (newData) => set((state) => ({ user: { ...state.user, ...newData } })),
+      rememberedDevices: {},
+      rememberDevice: (pseudo) => set((state) => ({
+        rememberedDevices: {
+          ...state.rememberedDevices,
+          [pseudo.toLowerCase()]: Date.now() + 30 * 24 * 60 * 60 * 1000
+        }
+      })),
+    }),
+    { 
+      name: 'eldersea-auth',
+      storage: createJSONStorage(() => localStorage)
+    }
+  )
+);
+
+export const useSettingsStore = create(
+  persist(
+    (set) => ({
+      ram: 6,
+      language: 'fr',
+      launchOnStartup: false,
+      backgroundMode: true,
+      showConsole: false,
+      installPath: 'C:\\Users\\User\\AppData\\Roaming\\.eldersea',
+      setRam: (ram) => set({ ram }),
+      setLanguage: (language) => set({ language }),
+      setLaunchOnStartup: (launchOnStartup) => set({ launchOnStartup }),
+      setBackgroundMode: (backgroundMode) => set({ backgroundMode }),
+      setShowConsole: (showConsole) => set({ showConsole }),
+      setInstallPath: (installPath) => set({ installPath }),
+    }),
+    { 
+      name: 'eldersea-settings',
+      storage: createJSONStorage(() => localStorage)
+    }
+  )
+);
