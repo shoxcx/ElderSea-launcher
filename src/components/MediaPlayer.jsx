@@ -50,7 +50,7 @@ const MediaPlayer = ({ isHidden }) => {
     
     const savedIndex = parseInt(localStorage.getItem('eldersea_music_index') || '6', 10);
 
-    playerRef.current = new window.YT.Player(containerRef.current, {
+    const playerOptions = {
       height: '0',
       width: '0',
       playerVars: {
@@ -63,7 +63,7 @@ const MediaPlayer = ({ isHidden }) => {
         fs: 0,
         rel: 0,
         modestbranding: 1,
-        origin: 'http://localhost'
+        origin: window.location.origin
       },
       events: {
         onReady: (event) => {
@@ -88,7 +88,13 @@ const MediaPlayer = ({ isHidden }) => {
           }
         }
       }
-    });
+    };
+
+    if (window.location.protocol === 'file:') {
+      playerOptions.host = 'https://www.youtube.com';
+    }
+
+    playerRef.current = new window.YT.Player(containerRef.current, playerOptions);
 
     return () => {
       // We don't destroy it here to keep playback going when it hides
