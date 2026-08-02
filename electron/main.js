@@ -4,6 +4,7 @@ import fs from 'fs';
 import https from 'https';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import http from 'http';
 
 import pkg from 'minecraft-launcher-core';
 import { exec } from 'child_process';
@@ -11,10 +12,6 @@ const { Client, Authenticator } = pkg;
 
 import pkgUpdater from 'electron-updater';
 const { autoUpdater } = pkgUpdater;
-
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, corsEnabled: true } }
-]);
 
 import DiscordRPC from 'discord-rpc';
 
@@ -28,6 +25,52 @@ let backgroundMode = true; // Match the Zustand store default value
 let showConsole = false;
 let consoleWindow = null;
 let logBuffer = [];
+let localServerPort = null;
+
+function startLocalServer() {
+  return new Promise((resolve) => {
+    const server = http.createServer((req, res) => {
+      let urlPath = req.url.split('?')[0];
+      if (urlPath === '/') urlPath = '/index.html';
+      
+      let filePath = path.join(__dirname, '../dist', urlPath);
+      
+      if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+        filePath = path.join(__dirname, '../dist/index.html');
+      }
+
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes = {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.svg': 'image/svg+xml',
+        '.ico': 'image/x-icon',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2'
+      };
+      
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+      
+      fs.readFile(filePath, (err, content) => {
+        if (err) {
+          res.writeHead(500);
+          res.end('Error loading file');
+        } else {
+          res.writeHead(200, { 'Content-Type': contentType });
+          res.end(content, 'utf-8');
+        }
+      });
+    });
+
+    server.listen(0, '127.0.0.1', () => {
+      resolve(server.address().port);
+    });
+  });
+}
 
 const launcher = new Client();
 const GAME_ROOT = path.join(process.env.APPDATA || (process.platform === 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME), '.eldersea');
@@ -210,7 +253,7 @@ if (!gotTheLock) {
     if (process.env.NODE_ENV === 'development') {
       mainWindow.loadURL('http://127.0.0.1:5173');
     } else {
-      mainWindow.loadURL('app://-/');
+      mainWindow.loadURL(`http://127.0.0.1:${localServerPort}`);
     }
 
     mainWindow.once('ready-to-show', async () => {
@@ -228,18 +271,10 @@ if (!gotTheLock) {
     });
   }
 
-  app.whenReady().then(() => {
-    protocol.handle('app', (request) => {
-      const urlPath = request.url.slice('app://-'.length).split('?')[0];
-      const normalizedPath = urlPath && urlPath !== '/' ? urlPath : 'index.html';
-      const filePath = path.join(__dirname, '../dist', normalizedPath);
-      
-      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        return net.fetch('file://' + filePath);
-      }
-      return net.fetch('file://' + path.join(__dirname, '../dist/index.html'));
-    });
-
+  app.whenReady().then(async () => {
+    if (process.env.NODE_ENV !== 'development') {
+      localServerPort = await startLocalServer();
+    }
     createWindow();
     initDiscordRPC();
   });
