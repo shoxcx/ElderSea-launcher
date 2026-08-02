@@ -9,8 +9,10 @@ import ImageHostingView from './views/ImageHostingView';
 import ShopView from './views/ShopView';
 import ProfileView from './views/ProfileView';
 import FriendsView from './views/FriendsView';
+import MapView from './views/MapView';
 import AuthModal from './components/AuthModal';
 import SettingsModal from './components/SettingsModal';
+import MediaPlayer from './components/MediaPlayer';
 import { useAuthStore, useSettingsStore } from './store/useStore';
 import { translations } from './translations';
 
@@ -406,6 +408,7 @@ function App() {
           {activeTab === 'screenshots' && <ScreenshotsView setFullscreen={setFullscreenImage} setActiveTab={setActiveTab} />}
           {activeTab === 'image-hosting' && <ImageHostingView setFullscreen={setFullscreenImage} setActiveTab={setActiveTab} />}
           {activeTab === 'shop' && <ShopView />}
+          {activeTab === 'map' && <MapView />}
           {activeTab === 'profile' && <ProfileView />}
           {activeTab === 'friends' && (
             <FriendsView 
@@ -798,6 +801,8 @@ function App() {
           </div>
         </div>
       )}
+
+      <MediaPlayer isHidden={!!downloadInfo || activeTab !== 'home'} />
     </div>
   );
 }

@@ -178,8 +178,6 @@ const Sidebar = ({ activeTab, setActiveTab, onOpenSettings, onOpenAuth, isProfil
             onClick={() => {
               if (item.id === 'shop') {
                 window.ipcRenderer.send('open-external-url', 'https://eldersea.tekao.fr/boutique');
-              } else if (item.id === 'map') {
-                window.ipcRenderer.send('open-external-url', 'http://tekao.fr:8100');
               } else {
                 setActiveTab(item.id);
               }

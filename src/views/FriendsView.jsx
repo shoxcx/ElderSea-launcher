@@ -1276,123 +1276,7 @@ const FriendsView = ({ setFullscreen, activeChatFriend, setActiveChatFriend, onI
                   </div>
                 )}
 
-                {/* Floating GIF Picker */}
-                {showGifPicker && (
-                  <div 
-                    ref={gifPickerRef}
-                    style={{
-                      position: 'absolute',
-                      bottom: '75px',
-                      right: '25px',
-                      width: '320px',
-                      background: 'rgba(15, 12, 30, 0.95)',
-                      backdropFilter: 'blur(15px)',
-                      border: '1px solid var(--border-bright)',
-                      borderRadius: '12px',
-                      padding: '15px',
-                      boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                      zIndex: 100,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '8px' }}>
-                      <span className="cinzel" style={{ fontSize: '11px', color: 'var(--crystal)', letterSpacing: '1px', fontWeight: 'bold' }}>GIFs Animés</span>
-                      <button 
-                        type="button" 
-                        onClick={() => setShowGifPicker(false)} 
-                        style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
 
-                    <input 
-                      type="text" 
-                      placeholder="Rechercher un GIF..." 
-                      value={gifSearchQuery}
-                      onChange={(e) => setGifSearchQuery(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 12px',
-                        fontSize: '11px',
-                        borderRadius: '6px',
-                        background: 'rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)',
-                        color: '#fff',
-                        outline: 'none'
-                      }}
-                    />
-
-                    <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px' }}>
-                      {['All', 'Minecraft', 'Pirates', 'Réactions'].map(category => (
-                        <button
-                          key={category}
-                          type="button"
-                          onClick={() => setActiveGifCategory(category)}
-                          style={{
-                            background: activeGifCategory === category ? 'rgba(168, 85, 247, 0.2)' : 'rgba(255,255,255,0.03)',
-                            border: activeGifCategory === category ? '1px solid var(--purple-light)' : '1px solid var(--border)',
-                            borderRadius: '20px',
-                            padding: '4px 10px',
-                            fontSize: '9px',
-                            color: activeGifCategory === category ? '#fff' : 'var(--text-dim)',
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            transition: 'all 0.2s',
-                            outline: 'none'
-                          }}
-                        >
-                          {category === 'All' ? 'Tout' : category}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', maxHeight: '200px', overflowY: 'auto', paddingRight: '4px' }}>
-                      {loadingGifs ? (
-                        <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '20px 0', fontSize: '11px', color: 'var(--text-muted)' }}>
-                          Chargement des GIFs...
-                        </div>
-                      ) : giphyGifs.length === 0 ? (
-                        <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '20px 0', fontSize: '11px', color: 'var(--text-muted)', opacity: 0.5 }}>
-                          Aucun GIF trouvé
-                        </div>
-                      ) : (
-                        giphyGifs.map(gif => (
-                          <img 
-                            key={gif.id} 
-                            src={gif.url} 
-                            alt={gif.title || "gif option"} 
-                            referrerPolicy="no-referrer"
-                            onClick={() => {
-                              sendDirectMessage(gif.url);
-                              setShowGifPicker(false);
-                            }}
-                            style={{
-                              width: '100%',
-                              height: '80px',
-                              objectFit: 'cover',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              border: '1px solid rgba(255,255,255,0.1)',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = 'var(--purple-light)';
-                              e.currentTarget.style.transform = 'scale(1.03)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                              e.currentTarget.style.transform = 'scale(1)';
-                            }}
-                          />
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
 
                 <input 
                   type="text" 
@@ -1408,7 +1292,7 @@ const FriendsView = ({ setFullscreen, activeChatFriend, setActiveChatFriend, onI
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button 
                     type="button"
-                    onClick={() => { setShowEmojiPicker(!showEmojiPicker); setShowGifPicker(false); }}
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     className="emoji-toggle-btn hover-glow-border"
                     style={{
                       width: '42px', height: '42px', borderRadius: '8px',
@@ -1422,21 +1306,7 @@ const FriendsView = ({ setFullscreen, activeChatFriend, setActiveChatFriend, onI
                     <Smile size={16} />
                   </button>
 
-                  <button 
-                    type="button"
-                    onClick={() => { setShowGifPicker(!showGifPicker); setShowEmojiPicker(false); }}
-                    className="gif-toggle-btn hover-glow-border"
-                    style={{
-                      width: '42px', height: '42px', borderRadius: '8px',
-                      background: showGifPicker ? 'rgba(168,85,247,0.2)' : 'rgba(0,0,0,0.2)',
-                      border: showGifPicker ? '1px solid var(--purple-light)' : '1px solid var(--border)',
-                      color: showGifPicker ? 'var(--purple-light)' : 'var(--crystal)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s'
-                    }}
-                    title="GIFs"
-                  >
-                    <Image size={16} />
-                  </button>
+
 
                   <button 
                     type="submit" 
