@@ -62,7 +62,8 @@ const MediaPlayer = ({ isHidden }) => {
         disablekb: 1,
         fs: 0,
         rel: 0,
-        modestbranding: 1
+        modestbranding: 1,
+        origin: 'http://localhost'
       },
       events: {
         onReady: (event) => {
