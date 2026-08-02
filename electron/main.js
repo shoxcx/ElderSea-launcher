@@ -12,6 +12,10 @@ const { Client, Authenticator } = pkg;
 import pkgUpdater from 'electron-updater';
 const { autoUpdater } = pkgUpdater;
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, corsEnabled: true } }
+]);
+
 import DiscordRPC from 'discord-rpc';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -206,7 +210,7 @@ if (!gotTheLock) {
     if (process.env.NODE_ENV === 'development') {
       mainWindow.loadURL('http://127.0.0.1:5173');
     } else {
-      mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+      mainWindow.loadURL('app://-/');
     }
 
     mainWindow.once('ready-to-show', async () => {
@@ -225,6 +229,17 @@ if (!gotTheLock) {
   }
 
   app.whenReady().then(() => {
+    protocol.handle('app', (request) => {
+      const urlPath = request.url.slice('app://-'.length).split('?')[0];
+      const normalizedPath = urlPath && urlPath !== '/' ? urlPath : 'index.html';
+      const filePath = path.join(__dirname, '../dist', normalizedPath);
+      
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        return net.fetch('file://' + filePath);
+      }
+      return net.fetch('file://' + path.join(__dirname, '../dist/index.html'));
+    });
+
     createWindow();
     initDiscordRPC();
   });

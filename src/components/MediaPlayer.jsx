@@ -90,10 +90,6 @@ const MediaPlayer = ({ isHidden }) => {
       }
     };
 
-    if (window.location.protocol === 'file:') {
-      playerOptions.host = 'https://www.youtube.com';
-    }
-
     playerRef.current = new window.YT.Player(containerRef.current, playerOptions);
 
     return () => {
