@@ -66,7 +66,15 @@ function startLocalServer() {
       });
     });
 
-    server.listen(0, '127.0.0.1', () => {
+    server.on('error', (e) => {
+      if (e.code === 'EADDRINUSE') {
+        server.listen(0, '127.0.0.1', () => {
+          resolve(server.address().port);
+        });
+      }
+    });
+
+    server.listen(37562, '127.0.0.1', () => {
       resolve(server.address().port);
     });
   });

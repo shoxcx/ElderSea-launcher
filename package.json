@@ -1,8 +1,8 @@
 {
   "name": "eldersea",
   "private": true,
-  "version": "1.5.16",
-  "description": "ElderSea Minecraft Launcher",
+  "version": "1.6
+  .16","description": "ElderSea Minecraft Launcher",
   "author": "Flores Studio Team",
   "type": "module",
   "main": "electron/main.js",
